@@ -1,7 +1,8 @@
 import "./App.css";
+import { EmployeeComponent } from "./components/EmployeeComponent";
 import { ListEmployeeComponent } from "./components/ListEmployeeComponent";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { EmployeeComponent } from "./components/EmployeeComponent";
+
 function App() {
   return (
     <>
