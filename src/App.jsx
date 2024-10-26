@@ -17,6 +17,11 @@ function App() {
             element={<ListEmployeeComponent className="text-white" />}
           ></Route>
           <Route path="/add-employee" element={<EmployeeComponent />}></Route>
+
+          <Route
+            path="/update-employee/:id"
+            element={<EmployeeComponent />}
+          ></Route>
         </Routes>
       </BrowserRouter>
     </>

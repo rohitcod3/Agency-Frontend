@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import listEmployees from "../services/EmployeeService";
+import { deleteEmployee } from "../services/EmployeeService";
 import { useNavigate } from "react-router-dom";
 
 export const ListEmployeeComponent = () => {
@@ -7,6 +8,10 @@ export const ListEmployeeComponent = () => {
 
   const navigator = useNavigate();
   useEffect(() => {
+    getAllEmployees();
+  }, []);
+
+  function getAllEmployees() {
     listEmployees()
       .then((response) => {
         setEmployee(response.data);
@@ -14,10 +19,24 @@ export const ListEmployeeComponent = () => {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
-
+  }
   function addNewEmployee() {
     navigator("/add-employee");
+  }
+
+  function updateEmployee(id) {
+    navigator(`/update-employee/${id}`);
+  }
+
+  function removeEmployee(id) {
+    console.log(id);
+    return deleteEmployee(id)
+      .then((response) => {
+        getAllEmployees();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
   return (
     <>
@@ -36,6 +55,7 @@ export const ListEmployeeComponent = () => {
               <th>Employee First Name</th>
               <th>Employee Last Name</th>
               <th>Employee Email Id</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -45,6 +65,20 @@ export const ListEmployeeComponent = () => {
                 <td>{employee.firstName}</td>
                 <td>{employee.lastName}</td>
                 <td>{employee.email}</td>
+                <td>
+                  <button
+                    className="btn btn-info"
+                    onClick={() => updateEmployee(employee.id)}
+                  >
+                    Update
+                  </button>
+                  <button
+                    className="btn btn-error mx-5"
+                    onClick={() => removeEmployee(employee.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
