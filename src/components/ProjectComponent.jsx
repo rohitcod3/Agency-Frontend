@@ -18,8 +18,10 @@ export const ProjectComponent = () => {
 
   useEffect(() => {
     if (id) {
+      console.log("getproject id data", id);
       getProject(id)
         .then((response) => {
+          console.log("api response", response.data);
           setProjectName(response.data.projectName);
           setStartDate(response.data.startDate);
           setEndDate(response.data.endDate);

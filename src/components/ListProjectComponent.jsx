@@ -62,7 +62,7 @@ export const ListProjectComponent = () => {
         <tbody>
           {projects.map((project) => (
             <tr key={project.id}>
-              <td className="border px-4 py-2">{project.id}</td>
+              <td className="border px-4 py-2">{project.clientId}</td>
               <td className="border px-4 py-2">{project.projectName}</td>
               <td className="border px-4 py-2">{project.startDate}</td>
               <td className="border px-4 py-2">{project.endDate}</td>
@@ -71,13 +71,13 @@ export const ListProjectComponent = () => {
               <td className="border px-4 py-2">
                 <button
                   className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 mr-2"
-                  onClick={() => updateProject(project.id)}
+                  onClick={() => updateProject(project.clientId)}
                 >
                   Update
                 </button>
                 <button
                   className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
-                  onClick={() => removeProject(project.id)}
+                  onClick={() => removeProject(project.clientId)}
                 >
                   Delete
                 </button>

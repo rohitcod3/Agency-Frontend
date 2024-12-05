@@ -11,6 +11,8 @@ export const createProject = (project) => {
 };
 
 export const getProject = (projectId) => {
+    console.log("Fetching project with ID:", projectId);
+
     return axios.get(`${PROJECT_API_BASE_URL}/${projectId}`);
 };
 

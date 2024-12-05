@@ -9,12 +9,12 @@ export const ListClientComponent = () => {
   useEffect(() => {
     getAllClients();
   }, []);
-  console.log("this is clients: ", clients);
+  // console.log("this is clients: ", clients);
   const getAllClients = () => {
     listClients()
       .then((response) => {
-        console.log(response.data);
-        console.log(Array.isArray(response.data));
+        // console.log(response.data);
+        // console.log(Array.isArray(response.data));
         setClients(response.data);
       })
       .catch((error) => {
@@ -26,12 +26,13 @@ export const ListClientComponent = () => {
     navigate("/add-client");
   };
 
-  const updateClient = (id) => {
-    navigate(`/update-client/${id}`);
+  const updateClient = (clientId) => {
+    navigate(`/update-client/${clientId}`);
+    // console.log("this is client id in update function", clientId);
   };
 
-  const removeClient = (id) => {
-    deleteClient(id)
+  const removeClient = (clientId) => {
+    deleteClient(clientId)
       .then(() => {
         getAllClients();
       })
@@ -71,13 +72,13 @@ export const ListClientComponent = () => {
                 <td className="border px-4 py-2">
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 mr-2"
-                    onClick={() => updateClient(client.id)}
+                    onClick={() => updateClient(client.clientId)}
                   >
                     Update
                   </button>
                   <button
                     className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
-                    onClick={() => removeClient(client.id)}
+                    onClick={() => removeClient(client.clientId)}
                   >
                     Delete
                   </button>

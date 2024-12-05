@@ -7,11 +7,14 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 
 export const ClientComponent = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
+  const [industry, setIndustry] = useState("");
   const { id } = useParams();
-  const [errors, setErrors] = useState({ name: "", email: "", phone: "" });
+  const [errors, setErrors] = useState({});
 
   const formRef = useRef(null);
   const navigate = useNavigate();
@@ -20,9 +23,14 @@ export const ClientComponent = () => {
     if (id) {
       getClient(id)
         .then((response) => {
-          setName(response.data.name);
-          setEmail(response.data.email);
-          setPhone(response.data.phone);
+          console.log("response", response.data);
+          const client = response.data;
+          setClientName(client.clientName);
+          setCompanyName(client.companyName);
+          setClientEmail(client.clientEmail);
+          setAddress(client.address);
+          setPhone(client.phone);
+          setIndustry(client.industry);
         })
         .catch((error) => {
           console.error(error);
@@ -32,43 +40,44 @@ export const ClientComponent = () => {
 
   const saveOrUpdateClient = (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      const client = { name, email, phone };
 
-      if (id) {
-        updateClient(id, client)
-          .then(() => navigate("/clients"))
-          .catch((error) => console.error(error));
-      } else {
-        createClient(client)
-          .then(() => navigate("/clients"))
-          .catch((error) => console.error(error));
-      }
+    // Create the client object
+    const client = {
+      clientName,
+      companyName,
+      clientEmail,
+      address,
+      phone,
+      industry,
+    };
+
+    if (id) {
+      updateClient(id, client)
+        .then(() => navigate("/clients"))
+        .catch((error) => console.error(error));
+    } else {
+      createClient(client)
+        .then(() => navigate("/clients"))
+        .catch((error) => console.error(error));
     }
   };
 
   const validateForm = () => {
     let valid = true;
-    const errorsCopy = { ...errors };
+    const errorsCopy = {};
 
-    if (name.trim()) {
-      errorsCopy.name = "";
-    } else {
-      errorsCopy.name = "Name is required";
+    if (!clientName.trim()) {
+      errorsCopy.clientName = "Client Name is required";
       valid = false;
     }
 
-    if (email.trim()) {
-      errorsCopy.email = "";
-    } else {
-      errorsCopy.email = "Email is required";
+    if (!clientEmail.trim()) {
+      errorsCopy.clientEmail = "Client Email is required";
       valid = false;
     }
 
-    if (phone.trim()) {
-      errorsCopy.phone = "";
-    } else {
-      errorsCopy.phone = "Phone is required";
+    if (!phone.trim()) {
+      errorsCopy.phone = "Phone number is required";
       valid = false;
     }
 
@@ -88,41 +97,64 @@ export const ClientComponent = () => {
 
       <form onSubmit={saveOrUpdateClient} ref={formRef}>
         <div className="mb-4">
-          <label className="block m-1">Name</label>
+          <label className="block m-1">Client Name</label>
           <input
             type="text"
-            placeholder="Enter client Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter Client Name"
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
             className={`input input-bordered input-info w-full max-w-[290px] rounded-md border ${
-              errors.name ? "border-red-500" : "border-gray-300"
+              errors.clientName ? "border-red-500" : "border-gray-300"
             }`}
           />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1">Email</label>
-          <input
-            type="email"
-            placeholder="Enter Client Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`input input-bordered input-info w-full max-w-[290px] rounded-md border ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+          {errors.clientName && (
+            <p className="text-red-500 text-sm mt-1">{errors.clientName}</p>
           )}
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1">Phone</label>
+          <label className="block m-1">Company Name</label>
           <input
             type="text"
-            placeholder="Enter Client Phone"
+            placeholder="Enter Company Name"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            className="input input-bordered input-info w-full max-w-[290px] rounded-md"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block m-1">Client Email</label>
+          <input
+            type="email"
+            placeholder="Enter Client Email"
+            value={clientEmail}
+            onChange={(e) => setClientEmail(e.target.value)}
+            className={`input input-bordered input-info w-full max-w-[290px] rounded-md border ${
+              errors.clientEmail ? "border-red-500" : "border-gray-300"
+            }`}
+          />
+          {errors.clientEmail && (
+            <p className="text-red-500 text-sm mt-1">{errors.clientEmail}</p>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <label className="block m-1">Address</label>
+          <input
+            type="text"
+            placeholder="Enter Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="input input-bordered input-info w-full max-w-[290px] rounded-md"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block m-1">Phone</label>
+          <input
+            type="text"
+            placeholder="Enter Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className={`input input-bordered input-info w-full max-w-[290px] rounded-md border ${
@@ -132,6 +164,17 @@ export const ClientComponent = () => {
           {errors.phone && (
             <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
           )}
+        </div>
+
+        <div className="mb-4">
+          <label className="block m-1">Industry</label>
+          <input
+            type="text"
+            placeholder="Enter Industry"
+            value={industry}
+            onChange={(e) => setIndustry(e.target.value)}
+            className="input input-bordered input-info w-full max-w-[290px] rounded-md"
+          />
         </div>
 
         <button
