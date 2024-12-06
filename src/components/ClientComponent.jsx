@@ -41,7 +41,6 @@ export const ClientComponent = () => {
   const saveOrUpdateClient = (e) => {
     e.preventDefault();
 
-    // Create the client object
     const client = {
       clientName,
       companyName,

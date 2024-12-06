@@ -35,16 +35,29 @@ export const ProjectComponent = () => {
   const saveOrUpdateProject = (e) => {
     e.preventDefault();
 
-    const project = { projectName, startDate, endDate, status, projectType };
+    const project = {
+      clientId: 17, // Use the clientId that works in Postman
+      projectName,
+      startDate,
+      endDate,
+      status,
+      projectType,
+    };
 
+    console.log("projecttt", project);
     if (id) {
+      console.log("response", project);
       updateProject(id, project)
         .then(() => navigate("/projects"))
         .catch((error) => console.error(error));
     } else {
+      console.log("Creating project:", project);
       createProject(project)
-        .then(() => navigate("/projects"))
-        .catch((error) => console.error(error));
+        .then(() => {
+          console.log("Project created successfully.");
+          navigate("/projects");
+        })
+        .catch((error) => console.error("Error creating project:", error));
     }
   };
 

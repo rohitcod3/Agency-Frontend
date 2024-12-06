@@ -14,6 +14,7 @@ export const ListEmployeeComponent = () => {
   function getAllEmployees() {
     listEmployees()
       .then((response) => {
+        console.log("response", response.data);
         setEmployee(response.data);
       })
       .catch((error) => {
