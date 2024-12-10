@@ -1,134 +1,136 @@
 import React, { useEffect, useState } from "react";
-import {
-  createProject,
-  getProject,
-  updateProject,
-} from "../services/ProjectService";
-import { useNavigate, useParams } from "react-router-dom";
+import { listProjects, deleteProject } from "../services/ProjectService";
+import { useNavigate } from "react-router-dom";
 
 export const ListProjectComponent = () => {
-  const [projectName, setProjectName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState("");
-  const [projectType, setProjectType] = useState("");
-
-  // Hardcoded clientId
-  const clientId = 12;
-  const projectId = 6;
-
-  const { id } = useParams();
+  const [projects, setProjects] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (id) {
-      getProject(id)
-        .then((response) => {
-          setProjectName(response.data.projectName);
-          setStartDate(response.data.startDate);
-          setEndDate(response.data.endDate);
-          setStatus(response.data.status);
-          setProjectType(response.data.projectType);
-        })
-        .catch((error) => console.error("Error fetching project:", error));
+    fetchAllProjects();
+  }, []);
+
+  // Fetch all projects from the backend
+  const fetchAllProjects = () => {
+    listProjects()
+      .then((response) => {
+        setProjects(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching projects:", error);
+      });
+  };
+
+  // Navigate to add a new project
+  const handleAddNewProject = () => {
+    navigate("/add-project");
+  };
+
+  // Validate project fields before allowing updates
+  const validateProject = (project) => {
+    const errors = [];
+    if (!project.projectName || project.projectName.trim() === "") {
+      errors.push("Project Name cannot be empty.");
     }
-  }, [id]);
+    if (!project.clientId || project.clientId <= 0) {
+      errors.push("Client ID must be valid.");
+    }
+    if (!project.startDate || project.startDate.trim() === "") {
+      errors.push("Start Date cannot be empty.");
+    }
+    if (!project.endDate || project.endDate.trim() === "") {
+      errors.push("End Date cannot be empty.");
+    }
+    if (!project.status || project.status.trim() === "") {
+      errors.push("Status cannot be empty.");
+    }
+    if (!project.projectType || project.projectType.trim() === "") {
+      errors.push("Project Type cannot be empty.");
+    }
+    return errors;
+  };
 
-  const saveOrUpdateProject = (e) => {
-    e.preventDefault();
+  // Navigate to update an existing project
+  const handleUpdateProject = (id) => {
+    const project = projects.find((p) => p.projectId === id);
 
-    const project = {
-      projectId,
-      clientId, // Hardcoded clientId
-      projectName,
-      startDate,
-      endDate,
-      status,
-      projectType,
-    };
+    if (project) {
+      const errors = validateProject(project);
 
-    if (id) {
-      updateProject(id, project)
-        .then(() => navigate("/projects"))
-        .catch((error) => console.error("Error updating project:", error));
-    } else {
-      createProject(project)
-        .then(() => navigate("/projects"))
-        .catch((error) => console.error("Error creating project:", error));
+      if (errors.length > 0) {
+        alert(`Validation Errors:\n${errors.join("\n")}`);
+        return;
+      }
+
+      navigate(`/update-project/${id}`);
     }
   };
 
-  const pageTitle = () => (
-    <h2 className="text-xl font-bold mb-4">
-      {id ? "Update Project" : "Add Project"}
-    </h2>
-  );
+  // Delete a project
+  const handleDeleteProject = (id) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      deleteProject(id)
+        .then(() => {
+          alert("Project deleted successfully!");
+          fetchAllProjects(); // Refresh the list of projects
+        })
+        .catch((error) => {
+          console.error("Error deleting project:", error);
+          alert("Failed to delete project.");
+        });
+    }
+  };
 
   return (
-    <div className="text-white border rounded-lg border-slate-400 md:min-w-[450px] md:min-h-[550px] flex flex-col justify-center">
-      {pageTitle()}
-
-      <form onSubmit={saveOrUpdateProject}>
-        <div className="mb-4">
-          <label className="block mb-1">Project Name</label>
-          <input
-            type="text"
-            placeholder="Enter Project Name"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-            className="input input-bordered input-info w-full max-w-[290px] rounded-md border"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Start Date</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="input input-bordered input-info w-full max-w-[290px] rounded-md border"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">End Date</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="input input-bordered input-info w-full max-w-[290px] rounded-md border"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Status</label>
-          <input
-            type="text"
-            placeholder="Enter Project Status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="input input-bordered input-info w-full max-w-[290px] rounded-md border"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Project Type</label>
-          <input
-            type="text"
-            placeholder="Enter Project Type"
-            value={projectType}
-            onChange={(e) => setProjectType(e.target.value)}
-            className="input input-bordered input-info w-full max-w-[290px] rounded-md border"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          Submit
-        </button>
-      </form>
+    <div className="p-6 hover">
+      <h2 className="text-2xl font-bold mb-4">List of Projects</h2>
+      <button
+        className="btn btn-outline btn-primary my-2"
+        onClick={handleAddNewProject}
+      >
+        Add Project
+      </button>
+      <table className="table ">
+        <thead>
+          <tr className="hover">
+            <th className="border px-4 py-2">Project ID</th>
+            <th className="border px-4 py-2">Project Name</th>
+            <th className="border px-4 py-2">Client ID</th>
+            <th className="border px-4 py-2">Start Date</th>
+            <th className="border px-4 py-2">End Date</th>
+            <th className="border px-4 py-2">Status</th>
+            <th className="border px-4 py-2">Project Type</th>
+            <th className="border px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="border border-collapse">
+          {projects.map((project) => (
+            <tr key={project.projectId}>
+              <td className="border px-4 py-2">{project.projectId}</td>
+              <td className="border px-4 py-2">{project.projectName}</td>
+              <td className="border px-4 py-2">{project.clientId}</td>
+              <td className="border px-4 py-2">{project.startDate}</td>
+              <td className="border px-4 py-2">{project.endDate}</td>
+              <td className="border px-4 py-2">{project.status}</td>
+              <td className="border px-4 py-2">{project.projectType}</td>
+              <td className="border px-4 py-2">
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 mr-2"
+                  onClick={() => handleUpdateProject(project.projectId)}
+                >
+                  Update
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                  onClick={() => handleDeleteProject(project.projectId)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

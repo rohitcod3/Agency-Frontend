@@ -16,14 +16,12 @@ export const ClientComponent = () => {
   const { id } = useParams();
   const [errors, setErrors] = useState({});
 
-  const formRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
       getClient(id)
         .then((response) => {
-          console.log("response", response.data);
           const client = response.data;
           setClientName(client.clientName);
           setCompanyName(client.companyName);
@@ -33,13 +31,40 @@ export const ClientComponent = () => {
           setIndustry(client.industry);
         })
         .catch((error) => {
-          console.error(error);
+          console.error("Error fetching client:", error);
         });
     }
   }, [id]);
 
+  const validateForm = () => {
+    let valid = true;
+    const errorsCopy = {};
+
+    if (!clientName.trim()) {
+      errorsCopy.clientName = "Client Name is required.";
+      valid = false;
+    }
+
+    if (!clientEmail.trim()) {
+      errorsCopy.clientEmail = "Client Email is required.";
+      valid = false;
+    }
+
+    if (!phone.trim()) {
+      errorsCopy.phone = "Phone number is required.";
+      valid = false;
+    }
+
+    setErrors(errorsCopy);
+    return valid;
+  };
+
   const saveOrUpdateClient = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     const client = {
       clientName,
@@ -53,35 +78,12 @@ export const ClientComponent = () => {
     if (id) {
       updateClient(id, client)
         .then(() => navigate("/clients"))
-        .catch((error) => console.error(error));
+        .catch((error) => console.error("Error updating client:", error));
     } else {
       createClient(client)
         .then(() => navigate("/clients"))
-        .catch((error) => console.error(error));
+        .catch((error) => console.error("Error creating client:", error));
     }
-  };
-
-  const validateForm = () => {
-    let valid = true;
-    const errorsCopy = {};
-
-    if (!clientName.trim()) {
-      errorsCopy.clientName = "Client Name is required";
-      valid = false;
-    }
-
-    if (!clientEmail.trim()) {
-      errorsCopy.clientEmail = "Client Email is required";
-      valid = false;
-    }
-
-    if (!phone.trim()) {
-      errorsCopy.phone = "Phone number is required";
-      valid = false;
-    }
-
-    setErrors(errorsCopy);
-    return valid;
   };
 
   const pageTitle = () => (
@@ -94,7 +96,7 @@ export const ClientComponent = () => {
     <div className="text-white border rounded-lg border-slate-400 md:min-w-[450px] md:min-h-[550px] flex flex-col justify-center">
       {pageTitle()}
 
-      <form onSubmit={saveOrUpdateClient} ref={formRef}>
+      <form onSubmit={saveOrUpdateClient}>
         <div className="mb-4">
           <label className="block m-1">Client Name</label>
           <input
@@ -102,7 +104,7 @@ export const ClientComponent = () => {
             placeholder="Enter Client Name"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
-            className={`input input-bordered input-info w-full max-w-[290px] rounded-md border ${
+            className={`input input-bordered input-info w-full max-w-[290px] rounded-md ${
               errors.clientName ? "border-red-500" : "border-gray-300"
             }`}
           />
@@ -129,7 +131,7 @@ export const ClientComponent = () => {
             placeholder="Enter Client Email"
             value={clientEmail}
             onChange={(e) => setClientEmail(e.target.value)}
-            className={`input input-bordered input-info w-full max-w-[290px] rounded-md border ${
+            className={`input input-bordered input-info w-full max-w-[290px] rounded-md ${
               errors.clientEmail ? "border-red-500" : "border-gray-300"
             }`}
           />
@@ -156,7 +158,7 @@ export const ClientComponent = () => {
             placeholder="Enter Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className={`input input-bordered input-info w-full max-w-[290px] rounded-md border ${
+            className={`input input-bordered input-info w-full max-w-[290px] rounded-md ${
               errors.phone ? "border-red-500" : "border-gray-300"
             }`}
           />

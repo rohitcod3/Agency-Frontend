@@ -44,7 +44,7 @@ export const ListEmployeeComponent = () => {
       <div>
         <h2>List of Employees</h2>
         <button
-          className="btn btn-outline btn-primary"
+          className="btn btn-outline my-2 btn-primary"
           onClick={addNewEmployee}
         >
           Add Employee
